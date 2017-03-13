@@ -5,7 +5,7 @@ RUN curl 'https://www.archlinux.org/mirrorlist/?country=CN&protocol=http&ip_vers
  && sed -i 's/^#//' /etc/pacman.d/mirrorlist \
  && curl 'https://raw.githubusercontent.com/archlinuxcn/mirrorlist-repo/master/README.md' | grep '^Server' > /etc/pacman.d/archlinuxcn-mirrorlist \
  # Global CDN has no nodes in mainland China
- && sed -i '/cdn/d' /etc/pacman.d/archlinuxcn-mirrorlist \
+ && sed -i '/cdn/s/^/#/' /etc/pacman.d/archlinuxcn-mirrorlist \
  && echo '[archlinuxcn]' >> /etc/pacman.conf \
  && echo 'SigLevel = Optional TrustedOnly' >> /etc/pacman.conf \
  && echo 'Include = /etc/pacman.d/archlinuxcn-mirrorlist' >> /etc/pacman.conf \
