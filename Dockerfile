@@ -1,17 +1,22 @@
-FROM finalduty/archlinux
+FROM archlinux/base
 MAINTAINER heliary rydesun@gmail.com
 
-RUN curl 'https://www.archlinux.org/mirrorlist/?country=CN&protocol=http&ip_version=4' > /etc/pacman.d/mirrorlist \
- && sed -i 's/^#//' /etc/pacman.d/mirrorlist \
- && curl 'https://raw.githubusercontent.com/archlinuxcn/mirrorlist-repo/master/README.md' | grep '^Server' > /etc/pacman.d/archlinuxcn-mirrorlist \
- # Global CDN has no nodes in mainland China
- && sed -i '/cdn/s/^/#/' /etc/pacman.d/archlinuxcn-mirrorlist \
+# 加入中国镜像源和社区仓库
+RUN curl 'https://www.archlinux.org/mirrorlist/?country=CN&protocol=https&ip_version=4' \
+        | sed 's/^#Server/Server/' > /etc/pacman.d/mirrorlist \
+ && curl 'https://raw.githubusercontent.com/archlinuxcn/mirrorlist-repo/master/archlinuxcn-mirrorlist' \
+        | sed 's/^#Server/Server/' > /etc/pacman.d/archlinuxcn-mirrorlist \
  && echo '[archlinuxcn]' >> /etc/pacman.conf \
  && echo 'SigLevel = Optional TrustedOnly' >> /etc/pacman.conf \
  && echo 'Include = /etc/pacman.d/archlinuxcn-mirrorlist' >> /etc/pacman.conf \
  && pacman -Syy \
+ # 更新pacman密钥
+ && pacman-key --init \
+ && pacman-key --populate archlinux \
  && pacman -S --noconfirm archlinuxcn-keyring \
+ # 设置中国时区
  && ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
- && rm /var/cache/pacman/pkg/*
+ # 清理缓存
+ && pacman --noconfirm -Scc
 
 CMD /bin/bash
